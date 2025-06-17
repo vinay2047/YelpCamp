@@ -22,20 +22,20 @@ const ejsMate=require('ejs-mate')
 const campgrounds=require('./routes/campgrounds.js')
 const reviews=require('./routes/reviews.js')
 const users=require('./routes/users.js')
-const dbUrl=process.env.DB_URL
-
+const dbUrl=process.env.DB_URL || 'mongodb://localhost:27017/yelp-camp'
+const secret=process.env.SECRET || 'thisshouldbeabettersecret!'
 
 const store = MongoStore.create({
-    mongoUrl: 'mongodb://localhost:27017/yelp-camp',
+    mongoUrl: dbUrl ,
     touchAfter: 24 * 60 * 60,
     crypto: {
-        secret: 'thisshouldbeabettersecret!'
+        secret 
     }
 });
 
 const sessionConfig={
     store,
-    secret:'secret',
+    secret,
     resave:false,
     saveUninitialized:true,
     cookie:{
@@ -79,7 +79,7 @@ app.use('/',users)
 
 
 
-mongoose.connect('mongodb://localhost:27017/yelp-camp')
+mongoose.connect(dbUrl)
 .then(()=>console.log('connected to mongoose'))
 .catch(err=>{
     console.log('connection failed')
@@ -101,7 +101,8 @@ app.use((err,req,res,next)=>{
 
 })
 
-app.listen(3000,(req,res)=>{
-    console.log('LISTENING ON PORT 3000')
+const port=process.env.PORT || 3000
+app.listen(port,(req,res)=>{
+    console.log(`LISTENING ON PORT ${port}`)
 })
 
